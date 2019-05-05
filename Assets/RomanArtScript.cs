@@ -1840,14 +1840,15 @@ public class RomanArtScript : MonoBehaviour {
         string[] parameters = command.Split(' ');
         foreach (string param in parameters)
         {
+            yield return null;
             if (param.Equals("cycle"))
             {
                 int amount = 0;
                 while(amount < 6)
                 {
-                    yield return new WaitForSeconds(2.0f);
-                    PressButton(buttons[0]);
+                    buttons[0].OnInteract();
                     amount++;
+                    yield return new WaitForSeconds(2.0f);
                 }
                 break;
             }
@@ -1863,44 +1864,44 @@ public class RomanArtScript : MonoBehaviour {
                         if(checker >= 3){
                             for(int i = 0; i < 6-checker; i++)
                             {
-                                PressButton(buttons[1]);
+                                buttons[1].OnInteract();
                                 yield return new WaitForSeconds(0.25f);
                             }
-                            PressButton(buttons[2]);
+                            buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
                         else if (checker > 0 && checker < 3){
                             for (int i = 0; i < checker; i++)
                             {
-                                PressButton(buttons[0]);
+                                buttons[0].OnInteract();
                                 yield return new WaitForSeconds(0.25f);
                             }
-                            PressButton(buttons[2]);
+                            buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
                         else if (checker == 0)
                         {
-                            PressButton(buttons[2]);
+                            buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
                         else if (checker > -3 && checker < 0)
                         {
                             for (int i = 0; i < Mathf.Abs(checker); i++)
                             {
-                                PressButton(buttons[1]);
+                                buttons[1].OnInteract();
                                 yield return new WaitForSeconds(0.25f);
                             }
-                            PressButton(buttons[2]);
+                            buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
                         else if (checker <= -3)
                         {
                             for (int i = 0; i < 6+checker; i++)
                             {
-                                PressButton(buttons[0]);
+                                buttons[0].OnInteract();
                                 yield return new WaitForSeconds(0.25f);
                             }
-                            PressButton(buttons[2]);
+                            buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
                     }
@@ -1912,6 +1913,5 @@ public class RomanArtScript : MonoBehaviour {
                 break;
             }
         }
-        yield return null;
     }
 }
