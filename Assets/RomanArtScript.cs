@@ -4,8 +4,10 @@ using System.Linq;
 using UnityEngine;
 using KModkit;
 using System;
+using System.Text.RegularExpressions;
 
-public class RomanArtScript : MonoBehaviour {
+public class RomanArtScript : MonoBehaviour
+{
 
     public KMAudio audio;
     public KMBombInfo bomb;
@@ -13,13 +15,13 @@ public class RomanArtScript : MonoBehaviour {
     public KMSelectable[] buttons;
 
     public GameObject numberdisplay;
-    private int[] numbers = {76,125,23,59,7,231,556,82,203};
+    private int[] numbers = { 76, 125, 23, 59, 7, 231, 556, 82, 203 };
     private int currentnumber = 0;
     public GameObject[] artpieces;
     private GameObject[] selectedpieces = new GameObject[6];
     private int currentselect = 0;
 
-    private string[] cheers = {"Fancy!","Roma","Clear","Doned"};
+    private string[] cheers = { "Fancy!", "Roma", "Clear", "Doned" };
 
     private string step1num;
     private int step2num;
@@ -34,15 +36,18 @@ public class RomanArtScript : MonoBehaviour {
     {
         moduleId = moduleIdCounter++;
         moduleSolved = false;
-        foreach(KMSelectable obj in buttons){
+        foreach (KMSelectable obj in buttons)
+        {
             KMSelectable pressed = obj;
             pressed.OnInteract += delegate () { PressButton(pressed); return false; };
         }
     }
 
-    void Start () {
-        if(bomb.GetStrikes() != 3)
+    void Start()
+    {
+        if (moduleSolved == false)
         {
+            order.Clear();
             randomizePieces();
             hideAllButSelected();
             randomizeNumber();
@@ -54,14 +59,14 @@ public class RomanArtScript : MonoBehaviour {
 
     void PressButton(KMSelectable pressed)
     {
-        if(moduleSolved != true)
+        if (moduleSolved != true)
         {
             pressed.AddInteractionPunch(0.5f);
             if (pressed.name.Equals("buttonRight"))
             {
                 selectedpieces[currentselect].SetActive(false);
                 currentselect++;
-                if(currentselect >= 6)
+                if (currentselect >= 6)
                 {
                     currentselect = 0;
                 }
@@ -82,7 +87,7 @@ public class RomanArtScript : MonoBehaviour {
             else if (pressed.name.Equals("displayArt"))
             {
                 int comparer = 0;
-                foreach(int s in order)
+                foreach (int s in order)
                 {
                     comparer = s;
                     break;
@@ -90,24 +95,21 @@ public class RomanArtScript : MonoBehaviour {
                 if ((currentselect + 1) == comparer)
                 {
                     order.RemoveAt(0);
-                    Debug.LogFormat("[Roman Art #{0}] Piece {1} Pressed, correct", moduleId, currentselect+1);
-                    if(order.Count != 0)
+                    Debug.LogFormat("[Roman Art #{0}] Piece {1} Pressed, correct", moduleId, currentselect + 1);
+                    if (order.Count != 0)
                     {
                         audio.PlaySoundAtTransform("paintsound", transform);
                     }
                 }
-                else
+                else if (((currentselect + 1) != comparer))
                 {
                     GetComponent<KMBombModule>().HandleStrike();
                     audio.PlaySoundAtTransform("paintsound", transform);
-                    order.Clear();
-                    selectedpieces = new GameObject[6];
                     Debug.LogFormat("[Roman Art #{0}] Piece {1} Pressed, incorrect", moduleId, currentselect + 1);
-                    Debug.LogFormat("[Roman Art #{0}] Resetting Module...", moduleId);
-                    currentselect = 0;
-                    Start();
+                    selectedpieces = new GameObject[6];
+                    currentselect = -1;
                 }
-                if (order.Count == 0)
+                if ((order.Count == 0) && (currentselect != -1))
                 {
                     GetComponent<KMBombModule>().HandlePass();
                     numberdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
@@ -127,6 +129,12 @@ public class RomanArtScript : MonoBehaviour {
                             break;
                         default: break;
                     }
+                }
+                if (currentselect == -1)
+                {
+                    Debug.LogFormat("[Roman Art #{0}] Resetting Module...", moduleId);
+                    currentselect = 0;
+                    Start();
                 }
             }
         }
@@ -218,43 +226,43 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "4";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "5";
                 }
@@ -264,119 +272,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "0";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "7";
                 }
@@ -386,119 +394,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "7";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "5";
                 }
@@ -508,119 +516,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
+                if (selectedpieces.Contains(artpieces[26]))
+                {
+                    step1num += "3";
+                }
+                if (selectedpieces.Contains(artpieces[25]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "3";
                 }
@@ -630,119 +638,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "5";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "6";
                 }
@@ -752,119 +760,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "1";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "5";
                 }
@@ -874,119 +882,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "6";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "3";
                 }
@@ -996,119 +1004,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "5";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "5";
                 }
@@ -1118,119 +1126,119 @@ public class RomanArtScript : MonoBehaviour {
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[20]))
+                if (selectedpieces.Contains(artpieces[20]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[21]))
+                if (selectedpieces.Contains(artpieces[21]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[4]))
+                if (selectedpieces.Contains(artpieces[4]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[13]))
+                if (selectedpieces.Contains(artpieces[13]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[9]))
+                if (selectedpieces.Contains(artpieces[9]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[6]))
+                if (selectedpieces.Contains(artpieces[6]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[10]))
+                if (selectedpieces.Contains(artpieces[10]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[11]))
+                if (selectedpieces.Contains(artpieces[11]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[8]))
+                if (selectedpieces.Contains(artpieces[8]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[29]))
+                if (selectedpieces.Contains(artpieces[29]))
                 {
                     step1num += "4";
                 }
-                 if (selectedpieces.Contains(artpieces[12]))
+                if (selectedpieces.Contains(artpieces[12]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[7]))
+                if (selectedpieces.Contains(artpieces[7]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[5]))
+                if (selectedpieces.Contains(artpieces[5]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[23]))
+                if (selectedpieces.Contains(artpieces[23]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[28]))
+                if (selectedpieces.Contains(artpieces[28]))
                 {
                     step1num += "1";
                 }
-                 if (selectedpieces.Contains(artpieces[14]))
+                if (selectedpieces.Contains(artpieces[14]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[17]))
+                if (selectedpieces.Contains(artpieces[17]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[16]))
+                if (selectedpieces.Contains(artpieces[16]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[15]))
+                if (selectedpieces.Contains(artpieces[15]))
                 {
                     step1num += "5";
                 }
-                 if (selectedpieces.Contains(artpieces[18]))
+                if (selectedpieces.Contains(artpieces[18]))
                 {
                     step1num += "7";
                 }
-                 if (selectedpieces.Contains(artpieces[22]))
+                if (selectedpieces.Contains(artpieces[22]))
                 {
                     step1num += "8";
                 }
-                 if (selectedpieces.Contains(artpieces[0]))
+                if (selectedpieces.Contains(artpieces[0]))
                 {
                     step1num += "9";
                 }
-                 if (selectedpieces.Contains(artpieces[1]))
+                if (selectedpieces.Contains(artpieces[1]))
                 {
                     step1num += "3";
                 }
-                 if (selectedpieces.Contains(artpieces[19]))
+                if (selectedpieces.Contains(artpieces[19]))
                 {
                     step1num += "2";
                 }
-                 if (selectedpieces.Contains(artpieces[24]))
+                if (selectedpieces.Contains(artpieces[24]))
                 {
                     step1num += "6";
                 }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
+                if (selectedpieces.Contains(artpieces[26]))
                 {
                     step1num += "0";
                 }
-                 if (selectedpieces.Contains(artpieces[3]))
+                if (selectedpieces.Contains(artpieces[25]))
+                {
+                    step1num += "8";
+                }
+                if (selectedpieces.Contains(artpieces[3]))
                 {
                     step1num += "2";
                 }
@@ -1287,1338 +1295,19 @@ public class RomanArtScript : MonoBehaviour {
         int.TryParse(step2, out step2num);
         Debug.LogFormat("[Roman Art #{0}] The New Number Received After Calculating Step 2 is {1}", moduleId, step2num);
     }
-    void Start () {
-        if(moduleSolved == false)
-        {
-            order.Clear();
-            randomizePieces();
-            hideAllButSelected();
-            randomizeNumber();
-            performStep1();
-            performStep2();
-            performStep3();
-        }
-    }
 
-    void PressButton(KMSelectable pressed)
-    {
-        if(moduleSolved != true)
-        {
-            pressed.AddInteractionPunch(0.5f);
-            if (pressed.name.Equals("buttonRight"))
-            {
-                selectedpieces[currentselect].SetActive(false);
-                currentselect++;
-                if(currentselect >= 6)
-                {
-                    currentselect = 0;
-                }
-                selectedpieces[currentselect].SetActive(true);
-                GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
-            }
-            else if (pressed.name.Equals("buttonLeft"))
-            {
-                selectedpieces[currentselect].SetActive(false);
-                currentselect--;
-                if (currentselect <= -1)
-                {
-                    currentselect = 5;
-                }
-                selectedpieces[currentselect].SetActive(true);
-                GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
-            }
-            else if (pressed.name.Equals("displayArt"))
-            {
-                int comparer = 0;
-                foreach(int s in order)
-                {
-                    comparer = s;
-                    break;
-                }
-                if ((currentselect + 1) == comparer)
-                {
-                    order.RemoveAt(0);
-                    Debug.LogFormat("[Roman Art #{0}] Piece {1} Pressed, correct", moduleId, currentselect + 1);
-                    if (order.Count != 0)
-                    {
-                        audio.PlaySoundAtTransform("paintsound", transform);
-                    }
-                }
-                else if (((currentselect + 1) != comparer))
-                {
-                    GetComponent<KMBombModule>().HandleStrike();
-                    audio.PlaySoundAtTransform("paintsound", transform);
-                    Debug.LogFormat("[Roman Art #{0}] Piece {1} Pressed, incorrect", moduleId, currentselect + 1);
-                    selectedpieces = new GameObject[6];
-                    currentselect = -1;
-                }
-                if ((order.Count == 0) && (currentselect != -1))
-                {
-                    GetComponent<KMBombModule>().HandlePass();
-                    numberdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
-                    Debug.LogFormat("[Roman Art #{0}] All Pieces Pressed Correctly, Module Disarmed.", moduleId, comparer);
-                    moduleSolved = true;
-                    int decider = randomVictory();
-                    switch (decider)
-                    {
-                        case 0:
-                            audio.PlaySoundAtTransform("victory", transform);
-                            break;
-                        case 1:
-                            audio.PlaySoundAtTransform("victory1", transform);
-                            break;
-                        case 2:
-                            audio.PlaySoundAtTransform("victory2", transform);
-                            break;
-                        default: break;
-                    }
-                }
-                if(currentselect == -1)
-                {
-                    Debug.LogFormat("[Roman Art #{0}] Resetting Module...", moduleId);
-                    currentselect = 0;
-                    Start();
-                }
-            }
-        }
-    }
-
-    private void performStep1()
-    {
-        step1num = "";
-        switch (currentnumber)
-        {
-            case 76:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "4";
-                }
-                if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "9";
-                }
-                if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "3";
-                }
-                if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "8";
-                }
-                if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "6";
-                }
-                if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "1";
-                }
-                if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "2";
-                }
-                if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "2";
-                }
-                if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "6";
-                }
-                if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "1";
-                }
-                if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "8";
-                }
-                if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "3";
-                }
-                if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "9";
-                }
-                if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "1";
-                }
-                if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "4";
-                }
-                if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "9";
-                }
-                if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "6";
-                }
-                if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "3";
-                }
-                if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "7";
-                }
-                if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "5";
-                }
-                break;
-            case 125:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "7";
-                }
-                break;
-            case 23:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "5";
-                }
-                break;
-            case 59:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "3";
-                }
-                break;
-            case 7:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "6";
-                }
-                break;
-            case 231:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "5";
-                }
-                break;
-            case 556:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "3";
-                }
-                break;
-            case 82:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "5";
-                }
-                break;
-            case 203:
-                if (selectedpieces.Contains(artpieces[27]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[20]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[21]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[4]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[13]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[2]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[9]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[6]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[10]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[11]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[8]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[29]))
-                {
-                    step1num += "4";
-                }
-                 if (selectedpieces.Contains(artpieces[12]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[7]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[5]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[23]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[28]))
-                {
-                    step1num += "1";
-                }
-                 if (selectedpieces.Contains(artpieces[14]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[17]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[16]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[15]))
-                {
-                    step1num += "5";
-                }
-                 if (selectedpieces.Contains(artpieces[18]))
-                {
-                    step1num += "7";
-                }
-                 if (selectedpieces.Contains(artpieces[22]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[0]))
-                {
-                    step1num += "9";
-                }
-                 if (selectedpieces.Contains(artpieces[1]))
-                {
-                    step1num += "3";
-                }
-                 if (selectedpieces.Contains(artpieces[19]))
-                {
-                    step1num += "2";
-                }
-                 if (selectedpieces.Contains(artpieces[24]))
-                {
-                    step1num += "6";
-                }
-                 if (selectedpieces.Contains(artpieces[26]))
-                {
-                    step1num += "0";
-                }
-                 if (selectedpieces.Contains(artpieces[25]))
-                {
-                    step1num += "8";
-                }
-                 if (selectedpieces.Contains(artpieces[3]))
-                {
-                    step1num += "2";
-                }
-                break;
-            default:
-                break;
-        }
-        Debug.LogFormat("[Roman Art #{0}] The 6-Digit Number Generated from Step 1 is {1}", moduleId, step1num);
-    }
-
-    private void performStep3()
-    {
-        string step3Numeral = numberToNumeral(step2num);
-        Debug.LogFormat("[Roman Art #{0}] The New Number Encrypted by Step 3 is {1}", moduleId, step3Numeral);
-
-        if((step2num < 100000) && (bomb.IsIndicatorPresent("SND")) && !(selectedpieces.Contains(artpieces[29])))
-        {
-            order.Add(2);
-            order.Add(5);
-            if (selectedpieces.Contains(artpieces[17]))
-            {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[17])+1));
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 5th piece, and the Statue of David", moduleId);
-            }
-            else
-            {
-                order.Add(4);
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 5th piece, and 4th piece", moduleId);
-            }
-        }
-        else if ((xCounter(step3Numeral) < 3) && (serialHasOdd()))
-        {
-            order.Add(5);
-            order.Add(6);
-            order.Add(1);
-            order.Add(3);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 5th piece, 6th piece, 1st piece, and 3rd piece", moduleId);
-        }
-        else if ((step2num > 200000) && (selectedpieces.Contains(artpieces[24])))
-        {
-            order.Add(6);
-            if (selectedpieces.Contains(artpieces[15]))
-            {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[15]))+1);
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 6th piece and The Pantheon", moduleId);
-            }
-            else
-            {
-                order.Add(1);
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 6th piece and 1st piece", moduleId);
-            }
-        }
-        else if ((iCounter(step3Numeral) >= 3) && (bomb.GetBatteryCount() == 0))
-        {
-            order.Add(4);
-            order.Add(2);
-            order.Add(1);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 4th piece, 2nd piece, and 1st piece", moduleId);
-        }
-        else if (step3Numeral.Length <= 5)
-        {
-            order.Add(3);
-            order.Add(2);
-            order.Add(5);
-            order.Add(2);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 3rd piece, 2nd piece, 5th piece, and 2nd piece", moduleId);
-        }
-        else if ((selectedpieces.Contains(artpieces[4])) && (selectedpieces.Contains(artpieces[5])))
-        {
-            order.Add(1);
-            order.Add(3);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 1st piece and 3rd piece", moduleId);
-        }
-        else if ((step2num > 2506) && (bomb.IsPortPresent("DVI")))
-        {
-            order.Add(3);
-            order.Add(6);
-            order.Add(5);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 3rd piece, 6th piece, and 5th piece", moduleId);
-        }
-        else if ((step2num % 5) == 0)
-        {
-            order.Add(2);
-            order.Add(6);
-            if (selectedpieces.Contains(artpieces[25]))
-            {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[25]))+1);
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 6th piece, and the Head of Medusa", moduleId);
-            }
-            else
-            {
-                order.Add(2);
-                Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 6th piece, and 2nd piece", moduleId);
-            }
-        }
-        else if (bomb.GetPortCount() <= 3)
-        {
-            order.Add(5);
-            order.Add(6);
-            order.Add(1);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 5th piece, 6th piece, and 1st piece", moduleId);
-        }
-        else
-        {
-            order.Add(4);
-            order.Add(1);
-            order.Add(5);
-            order.Add(3);
-            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 4th piece, 1st piece, 5th piece, and 3rd piece", moduleId);
-        }
-    }
-
-    private int xCounter(string num)
-    {
-        int xcount = 0;
-        char[] nums = num.ToCharArray();
-        foreach (char thing in nums)
-        {
-            if (thing.Equals('X'))
-            {
-                xcount++;
-            }
-        }
-        return xcount;
-    }
     private void performStep3()
     {
         string step3Numeral = numberToNumeral(step2num);
         Debug.LogFormat("[Roman Art #{0}] The New (Broken) Numeral Encrypted by Step 3 is {1}", moduleId, step3Numeral);
 
-        if((step2num < 500000) && (bomb.IsIndicatorPresent("SND")) && !(selectedpieces.Contains(artpieces[29])))
+        if ((step2num < 500000) && (bomb.IsIndicatorPresent("SND")) && !(selectedpieces.Contains(artpieces[29])))
         {
             order.Add(2);
             order.Add(5);
             if (selectedpieces.Contains(artpieces[17]))
             {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[17])+1));
+                order.Add((Array.IndexOf(selectedpieces, artpieces[17]) + 1));
                 Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 5th piece, and the Statue of David", moduleId);
             }
             else
@@ -2640,7 +1329,7 @@ public class RomanArtScript : MonoBehaviour {
             order.Add(6);
             if (selectedpieces.Contains(artpieces[15]))
             {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[15]))+1);
+                order.Add((Array.IndexOf(selectedpieces, artpieces[15])) + 1);
                 Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 6th piece and The Pantheon", moduleId);
             }
             else
@@ -2683,7 +1372,7 @@ public class RomanArtScript : MonoBehaviour {
             order.Add(6);
             if (selectedpieces.Contains(artpieces[26]))
             {
-                order.Add((Array.IndexOf(selectedpieces, artpieces[26]))+1);
+                order.Add((Array.IndexOf(selectedpieces, artpieces[26])) + 1);
                 Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 2nd piece, 6th piece, and the Head of Medusa", moduleId);
             }
             else
@@ -2787,6 +1476,20 @@ public class RomanArtScript : MonoBehaviour {
         }
     }
 
+    private int xCounter(string num)
+    {
+        int xcount = 0;
+        char[] nums = num.ToCharArray();
+        foreach (char thing in nums)
+        {
+            if (thing.Equals('X'))
+            {
+                xcount++;
+            }
+        }
+        return xcount;
+    }
+
     private int iCounter(string num)
     {
         int icount = 0;
@@ -2830,6 +1533,7 @@ public class RomanArtScript : MonoBehaviour {
             }
         }
     }
+
     private void randomizeNumber()
     {
         int rando = UnityEngine.Random.RandomRange(0, 9);
@@ -3099,217 +1803,6 @@ public class RomanArtScript : MonoBehaviour {
         }
     }
 
-    private void randomizeNumber()
-    {
-        int rando = UnityEngine.Random.RandomRange(0, 9);
-        currentnumber = numbers[rando];
-        string numeral = numberToNumeral(currentnumber);
-        numberdisplay.GetComponentInChildren<TextMesh>().text = numeral;
-        Debug.LogFormat("[Roman Art #{0}] The Roman Numeral is {1} ({2})", moduleId, numeral, currentnumber);
-    }
-
-    private string numberToNumeral(int num)
-    {
-        string numeral = "";
-        while (num >= 500000)
-        {
-            num -= 500000;
-            numeral += "D(bar)";
-        }
-        while (num >= 100000)
-        {
-            num -= 100000;
-            numeral += "C(bar)";
-        }
-        while (num >= 50000)
-        {
-            num -= 50000;
-            numeral += "L(bar)";
-        }
-        while (num >= 10000)
-        {
-            num -= 10000;
-            numeral += "X(bar)";
-        }
-        while (num >= 5000)
-        {
-            num -= 5000;
-            numeral += "V(bar)";
-        }
-        while (num >= 1000)
-        {
-            num -= 1000;
-            numeral += "M";
-        }
-        while (num >= 500)
-        {
-            num -= 500;
-            numeral += "D";
-        }
-        while (num >= 100)
-        {
-            num -= 100;
-            numeral += "C";
-        }
-        while (num >= 50)
-        {
-            num -= 50;
-            numeral += "L";
-        }
-        while (num >= 10)
-        {
-            num -= 10;
-            numeral += "X";
-        }
-        while (num >= 5)
-        {
-            num -= 5;
-            numeral += "V";
-        }
-        while (num >= 1)
-        {
-            num -= 1;
-            numeral += "I";
-        }
-        return numeral;
-    }
-
-    private string convertObjectToName(GameObject obj)
-    {
-        if (obj.name.Equals("homer"))
-        {
-            return "Statue of Homer";
-        }
-        else if (obj.name.Equals("marcuscolumn"))
-        {
-            return "Column of Marcus Aurelius";
-        }
-        else if (obj.name.Equals("venus"))
-        {
-            return "Statue of Capitoline Venus";
-        }
-        else if (obj.name.Equals("jupitertemple"))
-        {
-            return "Temple of Jupiter (Lebanon)";
-        }
-        else if (obj.name.Equals("archtitus"))
-        {
-            return "The Arch of Titus";
-        }
-        else if (obj.name.Equals("archconstantine"))
-        {
-            return "The Arch of Constantine";
-        }
-        else if (obj.name.Equals("archseverus"))
-        {
-            return "The Arch of Septimius Severus";
-        }
-        else if (obj.name.Equals("caesarjbust"))
-        {
-            return "Bust of Julius Caesar";
-        }
-        else if (obj.name.Equals("caesarabust"))
-        {
-            return "Bust of Caesar Augustus";
-        }
-        else if (obj.name.Equals("circusmaximus"))
-        {
-            return "The Circus Maximus";
-        }
-        else if (obj.name.Equals("trajan"))
-        {
-            return "Statue of Trajan";
-        }
-        else if (obj.name.Equals("dionysusleaning"))
-        {
-            return "Statue of Dionysus Leaning on a Woman";
-        }
-        else if (obj.name.Equals("woman2ndcent"))
-        {
-            return "Statue of a Roman Woman (2nd Century A.D.)";
-        }
-        else if (obj.name.Equals("hadrianbust"))
-        {
-            return "Bust of Hadrian";
-        }
-        else if (obj.name.Equals("ecstacystteresa"))
-        {
-            return "The Ecstacy of St. Teresa";
-        }
-        else if (obj.name.Equals("pantheon"))
-        {
-            return "The Pantheon";
-        }
-        else if (obj.name.Equals("anchisesandmore"))
-        {
-            return "Statue of Anchises, Aeneas, and Ascanius";
-        }
-        else if (obj.name.Equals("david"))
-        {
-            return "Statue of David";
-        }
-        else if (obj.name.Equals("rapeofproserpina"))
-        {
-            return "The Rape of Proserpina";
-        }
-        else if (obj.name.Equals("apolloanddaphne"))
-        {
-            return "Statue of Daphne Running from Apollo";
-        }
-        else if (obj.name.Equals("catmosaic"))
-        {
-            return "Cat Mosaic";
-        }
-        else if (obj.name.Equals("dogmosaic"))
-        {
-            return "Dog Mosaic";
-        }
-        else if (obj.name.Equals("frescoboscoreale"))
-        {
-            return "Fresco from Boscoreale";
-        }
-        else if (obj.name.Equals("frescopompeii"))
-        {
-            return "Fresco from Pompeii";
-        }
-        else if (obj.name.Equals("medusa"))
-        {
-            return "Head of Medusa";
-        }
-        else if (obj.name.Equals("mithras"))
-        {
-            return "Statue of Mithras Performing a Tauroctony";
-        }
-        else if (obj.name.Equals("nerobust"))
-        {
-            return "Bust of Nero";
-        }
-        else if (obj.name.Equals("serapisbust"))
-        {
-            return "Bust of Serapis";
-        }
-        else if (obj.name.Equals("templeofvesta"))
-        {
-            return "Temple of Vesta";
-        }
-        else if (obj.name.Equals("fiumifountain"))
-        {
-            return "The Fiumi Fountain";
-        }
-        else
-        {
-            return null;
-        }
-    }
-    private int getWidgetCount()
-    {
-        int tempcount = 0;
-        tempcount += bomb.GetBatteryHolderCount();
-        tempcount += bomb.GetPortPlateCount();
-        tempcount += getIndicatorCount();
-        return tempcount;
-    }
-
     private int getIndicatorCount()
     {
         int tempcount = 0;
@@ -3404,25 +1897,6 @@ public class RomanArtScript : MonoBehaviour {
         return tempcount;
     }
 
-    private float reCalcPosition(bool rule1, float num1, float num2, float num3, float num4)
-    {
-        float tempanswer;
-        Debug.LogFormat("[Equations X #{0}] Rule 3 is now true! Recalculating answer...", moduleId);
-        if (rule1 == true)
-        {
-            tempanswer = (num1 * Mathf.Sin(((num2 * num3) + num4) * ((Mathf.PI) / 180))) + 21;
-            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * sin((num2 * num3) + num4)) + 21", moduleId);
-            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * sin(({2} * {3}) + {4})) + 21", moduleId, num1, num2, num3, num4);
-        }
-        else
-        {
-            tempanswer = num1 * Mathf.Sin(((num2 * num3) + num4) * ((Mathf.PI) / 180));
-            Debug.LogFormat("[Equations X #{0}] New Equation: num1 * sin((num2 * num3) + num4)", moduleId);
-            Debug.LogFormat("[Equations X #{0}] With number substitutions: {1} * sin(({2} * {3}) + {4})", moduleId, num1, num2, num3, num4);
-        }
-        return tempanswer;
-    }
-
     private int getWidgetCount()
     {
         int tempcount = 0;
@@ -3435,7 +1909,7 @@ public class RomanArtScript : MonoBehaviour {
     private bool bombHasModule(string name)
     {
         List<string> modules = bomb.GetModuleNames();
-        foreach(string mod in modules)
+        foreach (string mod in modules)
         {
             if (mod.EqualsIgnoreCase(name))
             {
@@ -3467,9 +1941,9 @@ public class RomanArtScript : MonoBehaviour {
 
     private bool isAnyPlateEmpty()
     {
-        foreach(string[] plateports in bomb.GetPortPlates())
+        foreach (string[] plateports in bomb.GetPortPlates())
         {
-            if(plateports.Length == 0)
+            if (plateports.Length == 0)
             {
                 return true;
             }
@@ -3490,37 +1964,110 @@ public class RomanArtScript : MonoBehaviour {
     }
 
     //twitch plays
-#pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all pieces on the module] | !{0} press 2 4 5 [Presses the pieces in the specified order. In this case the 2nd piece, 4th piece, and 5th piece]";
-#pragma warning restore 414
+
+    private bool stringIsDigit(string s)
+    {
+        int temp = 0;
+        int.TryParse(s, out temp);
+        if (temp != 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool inputIsValid(string cmd)
+    {
+        char[] validchars = {' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        char[] cmdchars = cmd.ToCharArray();
+        for(int i = 5; i < cmdchars.Length; i++)
+        {
+            if (!validchars.Contains(cmdchars[i]))
+            {
+                return false;
+            }
+        }
+        string[] parameters = cmd.Split(' ');
+        foreach (string str in parameters)
+        {
+            if(!str.EqualsIgnoreCase("press"))
+            {
+                int temp = 0;
+                int.TryParse(str, out temp);
+                if (!((temp >= 1) && (temp <= 6)))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all pieces on the module] | !{0} left [Cycle the pieces to the left by 1 (6th to 5th for example)] | !{0} right [Cycle the pieces to the right by 1 (5th to 6th for example)] | !{0} press [Presses the piece that is currently displayed] | !{0} press 2 4 5 [Presses several pieces in a specified order, in this case the 2nd piece, 4th piece, and 5th piece] | !{0} reset [Sets the display back to the initial position at piece #1]";
+    #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] parameters = command.Split(' ');
-        foreach (string param in parameters)
+        if (Regex.IsMatch(command, @"^\s*reset\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            if (param.Equals("cycle"))
+            selectedpieces[currentselect].SetActive(false);
+            currentselect = 0;
+            selectedpieces[currentselect].SetActive(true);
+            yield return new WaitForSeconds(0.25f);
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*cycle\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            int amount = 0;
+            while (amount < 6)
             {
-                int amount = 0;
-                while (amount < 6)
-                {
-                    buttons[0].OnInteract();
-                    amount++;
-                    yield return new WaitForSeconds(2.0f);
-                }
-                break;
+                yield return new[] { buttons[0] };
+                amount++;
+                yield return new WaitForSeconds(2.0f);
             }
-            else if (param.Equals("press") && !(parameters.Length <= 1))
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*left\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            yield return new[] { buttons[1] };
+            yield return new WaitForSeconds(0.25f);
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*right\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            yield return new[] { buttons[0] };
+            yield return new WaitForSeconds(0.25f);
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            yield return new[] { buttons[2] };
+            yield return new WaitForSeconds(0.25f);
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (inputIsValid(command))
             {
-                foreach (string para in parameters)
+                foreach (string str in parameters)
                 {
-                    if (para != "press")
+                    if (!str.EqualsIgnoreCase("press"))
                     {
                         int nextpress = 0;
-                        int.TryParse(para, out nextpress);
+                        int.TryParse(str, out nextpress);
                         int checker = nextpress - (currentselect + 1);
-                        if (checker >= 3) {
+                        if (checker >= 3)
+                        {
                             for (int i = 0; i < 6 - checker; i++)
                             {
                                 buttons[1].OnInteract();
@@ -3529,7 +2076,8 @@ public class RomanArtScript : MonoBehaviour {
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
                         }
-                        else if (checker > 0 && checker < 3) {
+                        else if (checker > 0 && checker < 3)
+                        {
                             for (int i = 0; i < checker; i++)
                             {
                                 buttons[0].OnInteract();
@@ -3565,122 +2113,113 @@ public class RomanArtScript : MonoBehaviour {
                         }
                     }
                 }
-                break;
-            }
-            else
-            {
-                break;
+                yield return null;
             }
         }
     }
-    //twitch plays
-    #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all pieces on the module] | !{0} left [Cycle the pieces to the left by 1 (6th to 5th for example)] | !{0} right [Cycle the pieces to the right by 1 (5th to 6th for example)] | !{0} press [Presses the piece that is currently displayed] | !{0} press 2 4 5 [Presses several pieces in a specified order, in this case the 2nd piece, 4th piece, and 5th piece] | !{0} reset [Sets the display back to the initial position at piece #1]";
-    #pragma warning restore 414
-
-    IEnumerator ProcessTwitchCommand(string command)
-    {
-        string[] parameters = command.Split(' ');
-        foreach (string param in parameters)
+        /*IEnumerator ProcessTwitchCommand(string command)
         {
-            yield return null;
-            if (param.EqualsIgnoreCase("cycle"))
+            string[] parameters = command.Split(' ');
+            foreach (string param in parameters)
             {
-                int amount = 0;
-                while(amount < 6)
+                yield return null;
+                if (param.EqualsIgnoreCase("cycle"))
                 {
-                    buttons[0].OnInteract();
-                    amount++;
-                    yield return new WaitForSeconds(2.0f);
-                }
-                break;
-            }
-            else if (param.Equals("press") && !(parameters.Length <= 1))
-            {
-                foreach (string para in parameters)
-                {
-                    if(para != "press")
+                    int amount = 0;
+                    while(amount < 6)
                     {
-                        int nextpress = 0;
-                        int.TryParse(para, out nextpress);
-                        int checker = nextpress - (currentselect+1);
-                        if(checker >= 3){
-                            for(int i = 0; i < 6-checker; i++)
-                            {
-                                buttons[1].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
-                            }
-                            buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
-                        }
-                        else if (checker > 0 && checker < 3){
-                            for (int i = 0; i < checker; i++)
-                            {
-                                buttons[0].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
-                            }
-                            buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
-                        }
-                        else if (checker == 0)
+                        buttons[0].OnInteract();
+                        amount++;
+                        yield return new WaitForSeconds(2.0f);
+                    }
+                    break;
+                }
+                else if (param.Equals("press") && !(parameters.Length <= 1))
+                {
+                    foreach (string para in parameters)
+                    {
+                        if(para != "press")
                         {
-                            buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
-                        }
-                        else if (checker > -3 && checker < 0)
-                        {
-                            for (int i = 0; i < Mathf.Abs(checker); i++)
-                            {
-                                buttons[1].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                            int nextpress = 0;
+                            int.TryParse(para, out nextpress);
+                            int checker = nextpress - (currentselect+1);
+                            if(checker >= 3){
+                                for(int i = 0; i < 6-checker; i++)
+                                {
+                                    buttons[1].OnInteract();
+                                    yield return new WaitForSeconds(0.25f);
+                                }
+                                buttons[2].OnInteract();
+                                yield return new WaitForSeconds(0.5f);
                             }
-                            buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
-                        }
-                        else if (checker <= -3)
-                        {
-                            for (int i = 0; i < 6+checker; i++)
-                            {
-                                buttons[0].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                            else if (checker > 0 && checker < 3){
+                                for (int i = 0; i < checker; i++)
+                                {
+                                    buttons[0].OnInteract();
+                                    yield return new WaitForSeconds(0.25f);
+                                }
+                                buttons[2].OnInteract();
+                                yield return new WaitForSeconds(0.5f);
                             }
-                            buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
+                            else if (checker == 0)
+                            {
+                                buttons[2].OnInteract();
+                                yield return new WaitForSeconds(0.5f);
+                            }
+                            else if (checker > -3 && checker < 0)
+                            {
+                                for (int i = 0; i < Mathf.Abs(checker); i++)
+                                {
+                                    buttons[1].OnInteract();
+                                    yield return new WaitForSeconds(0.25f);
+                                }
+                                buttons[2].OnInteract();
+                                yield return new WaitForSeconds(0.5f);
+                            }
+                            else if (checker <= -3)
+                            {
+                                for (int i = 0; i < 6+checker; i++)
+                                {
+                                    buttons[0].OnInteract();
+                                    yield return new WaitForSeconds(0.25f);
+                                }
+                                buttons[2].OnInteract();
+                                yield return new WaitForSeconds(0.5f);
+                            }
                         }
                     }
+                    break;
                 }
-                break;
+                else if (param.EqualsIgnoreCase("press") && (parameters.Length == 1))
+                {
+                    buttons[2].OnInteract();
+                    yield return new WaitForSeconds(0.25f);
+                    break;
+                }
+                else if (param.EqualsIgnoreCase("left") && (parameters.Length == 1))
+                {
+                    buttons[1].OnInteract();
+                    yield return new WaitForSeconds(0.25f);
+                    break;
+                }
+                else if (param.EqualsIgnoreCase("right") && (parameters.Length == 1))
+                {
+                    buttons[0].OnInteract();
+                    yield return new WaitForSeconds(0.25f);
+                    break;
+                }
+                else if (param.EqualsIgnoreCase("reset") && (parameters.Length == 1))
+                {
+                    selectedpieces[currentselect].SetActive(false);
+                    currentselect = 0;
+                    selectedpieces[currentselect].SetActive(true);
+                    yield return new WaitForSeconds(0.25f);
+                    break;
+                }
+                else
+                {
+                    break;
+                }
             }
-            else if (param.EqualsIgnoreCase("press") && (parameters.Length == 1))
-            {
-                buttons[2].OnInteract();
-                yield return new WaitForSeconds(0.25f);
-                break;
-            }
-            else if (param.EqualsIgnoreCase("left") && (parameters.Length == 1))
-            {
-                buttons[1].OnInteract();
-                yield return new WaitForSeconds(0.25f);
-                break;
-            }
-            else if (param.EqualsIgnoreCase("right") && (parameters.Length == 1))
-            {
-                buttons[0].OnInteract();
-                yield return new WaitForSeconds(0.25f);
-                break;
-            }
-            else if (param.EqualsIgnoreCase("reset") && (parameters.Length == 1))
-            {
-                selectedpieces[currentselect].SetActive(false);
-                currentselect = 0;
-                selectedpieces[currentselect].SetActive(true);
-                yield return new WaitForSeconds(0.25f);
-                break;
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
+        }*/
 }
