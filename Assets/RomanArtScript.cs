@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
+using Newtonsoft.Json;
 using System;
 using System.Text.RegularExpressions;
 
@@ -11,9 +12,11 @@ public class RomanArtScript : MonoBehaviour
 
     public KMAudio audio;
     public KMBombInfo bomb;
+    public KMModSettings ModSettings;
 
     public KMSelectable[] buttons;
 
+    public GameObject censordisplay;
     public GameObject numberdisplay;
     private int[] numbers = { 76, 125, 23, 59, 7, 231, 556, 82, 203 };
     private int currentnumber = 0;
@@ -28,6 +31,13 @@ public class RomanArtScript : MonoBehaviour
 
     private ArrayList order = new ArrayList();
 
+    // Mod Settings
+    class Settings
+    {
+        public bool censored;
+    }
+    Settings modSettings;
+
     static int moduleIdCounter = 1;
     int moduleId;
     private bool moduleSolved;
@@ -40,6 +50,16 @@ public class RomanArtScript : MonoBehaviour
         {
             KMSelectable pressed = obj;
             pressed.OnInteract += delegate () { PressButton(pressed); return false; };
+        }
+        modSettings = JsonConvert.DeserializeObject<Settings>(ModSettings.Settings);
+        Debug.LogFormat("[Roman Art #{0}] Censored mode: {1}", moduleId, modSettings.censored);
+        if(modSettings.censored == false)
+        {
+            censordisplay.GetComponent<TextMesh>().text = " ";
+        }
+        else
+        {
+            censordisplay.GetComponent<TextMesh>().text = "C";
         }
     }
 
@@ -166,7 +186,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "6";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "1";
                 }
@@ -288,7 +308,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "0";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "2";
                 }
@@ -410,7 +430,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "2";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "2";
                 }
@@ -532,7 +552,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "5";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "8";
                 }
@@ -654,7 +674,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "4";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "1";
                 }
@@ -776,7 +796,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "2";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "6";
                 }
@@ -898,7 +918,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "4";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "6";
                 }
@@ -1020,7 +1040,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "1";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "0";
                 }
@@ -1142,7 +1162,7 @@ public class RomanArtScript : MonoBehaviour
                 {
                     step1num += "0";
                 }
-                if (selectedpieces.Contains(artpieces[2]))
+                if (selectedpieces.Contains(artpieces[2]) || selectedpieces.Contains(artpieces[30]))
                 {
                     step1num += "3";
                 }
@@ -1388,7 +1408,15 @@ public class RomanArtScript : MonoBehaviour
             order.Add(1);
             Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 5th piece, 6th piece, and 1st piece", moduleId);
         }
-        else if (!(selectedpieces.Contains(artpieces[2])) && step3Numeral.Contains("III"))
+        else if (!selectedpieces.Contains(artpieces[30]) && step3Numeral.Contains("III") && (modSettings.censored == false))
+        {
+            order.Add(4);
+            order.Add(6);
+            order.Add(1);
+            order.Add(3);
+            Debug.LogFormat("[Roman Art #{0}] The Order the Pieces Should be Pressed in Determined by Step 3 is 4th piece, 6th piece, 1st piece, and 3rd piece", moduleId);
+        }
+        else if (!selectedpieces.Contains(artpieces[2]) && step3Numeral.Contains("III") && (modSettings.censored == true))
         {
             order.Add(4);
             order.Add(6);
@@ -1512,7 +1540,14 @@ public class RomanArtScript : MonoBehaviour
             int rando = UnityEngine.Random.RandomRange(0, 30);
             if (!selectedpieces.Contains(artpieces[rando]))
             {
-                selectedpieces[amount] = artpieces[rando];
+                if(rando == 2 && modSettings.censored == false)
+                {
+                    selectedpieces[amount] = artpieces[30];
+                }
+                else
+                {
+                    selectedpieces[amount] = artpieces[rando];
+                }
                 amount++;
             }
         }
@@ -1689,6 +1724,10 @@ public class RomanArtScript : MonoBehaviour
         {
             return "The Sistine Chapel";
         }
+        else if (obj.name.Equals("venus"))
+        {
+            return "Statue of Capitoline Venus";
+        }
         else if (obj.name.Equals("jupitertemple"))
         {
             return "Temple of Jupiter (Lebanon)";
@@ -1751,7 +1790,14 @@ public class RomanArtScript : MonoBehaviour
         }
         else if (obj.name.Equals("rapeofproserpina"))
         {
-            return "Statue of Hades and Proserpina";
+            if(modSettings.censored == false)
+            {
+                return "The Rape of Proserpina";
+            }
+            else
+            {
+                return "Statue of Hades and Proserpina";
+            }
         }
         else if (obj.name.Equals("apolloanddaphne"))
         {
