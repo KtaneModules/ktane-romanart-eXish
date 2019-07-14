@@ -1537,12 +1537,19 @@ public class RomanArtScript : MonoBehaviour
         int amount = 0;
         while (amount != 6)
         {
-            int rando = UnityEngine.Random.RandomRange(0, 30);
+            int rando = UnityEngine.Random.Range(0, 30);
             if (!selectedpieces.Contains(artpieces[rando]))
             {
                 if(rando == 2 && modSettings.censored == false)
                 {
-                    selectedpieces[amount] = artpieces[30];
+                    if (!selectedpieces.Contains(artpieces[30]))
+                    {
+                        selectedpieces[amount] = artpieces[30];
+                    }
+                    else
+                    {
+                        amount--;
+                    }
                 }
                 else
                 {
