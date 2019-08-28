@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
-using Newtonsoft.Json;
 using System;
 using System.Text.RegularExpressions;
 
@@ -12,7 +11,6 @@ public class RomanArtScript : MonoBehaviour
 
     public KMAudio audio;
     public KMBombInfo bomb;
-    public KMModSettings ModSettings;
 
     public KMSelectable[] buttons;
 
@@ -32,11 +30,7 @@ public class RomanArtScript : MonoBehaviour
     private ArrayList order = new ArrayList();
 
     // Mod Settings
-    class Settings
-    {
-        public bool censored;
-    }
-    Settings modSettings;
+    private RomanArtSettings modSettings = new RomanArtSettings();
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -51,9 +45,13 @@ public class RomanArtScript : MonoBehaviour
             KMSelectable pressed = obj;
             pressed.OnInteract += delegate () { PressButton(pressed); return false; };
         }
-        modSettings = JsonConvert.DeserializeObject<Settings>(ModSettings.Settings);
+        ModConfig<RomanArtSettings> modConfig = new ModConfig<RomanArtSettings>("romanArtModule-settings");
+        //Read from the settings file, or create one if one doesn't exist
+        modSettings = modConfig.Settings;
+        //Update the settings file incase there was an error during read
+        modConfig.Settings = modSettings;
         Debug.LogFormat("[Roman Art #{0}] Censored mode: {1}", moduleId, modSettings.censored);
-        if(modSettings.censored == false)
+        if (modSettings.censored == false)
         {
             censordisplay.GetComponent<TextMesh>().text = " ";
         }
@@ -2170,109 +2168,131 @@ public class RomanArtScript : MonoBehaviour
             }
         }
     }
-        /*IEnumerator ProcessTwitchCommand(string command)
+    /*IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        foreach (string param in parameters)
         {
-            string[] parameters = command.Split(' ');
-            foreach (string param in parameters)
+            yield return null;
+            if (param.EqualsIgnoreCase("cycle"))
             {
-                yield return null;
-                if (param.EqualsIgnoreCase("cycle"))
-                {
-                    int amount = 0;
-                    while(amount < 6)
-                    {
-                        buttons[0].OnInteract();
-                        amount++;
-                        yield return new WaitForSeconds(2.0f);
-                    }
-                    break;
-                }
-                else if (param.Equals("press") && !(parameters.Length <= 1))
-                {
-                    foreach (string para in parameters)
-                    {
-                        if(para != "press")
-                        {
-                            int nextpress = 0;
-                            int.TryParse(para, out nextpress);
-                            int checker = nextpress - (currentselect+1);
-                            if(checker >= 3){
-                                for(int i = 0; i < 6-checker; i++)
-                                {
-                                    buttons[1].OnInteract();
-                                    yield return new WaitForSeconds(0.25f);
-                                }
-                                buttons[2].OnInteract();
-                                yield return new WaitForSeconds(0.5f);
-                            }
-                            else if (checker > 0 && checker < 3){
-                                for (int i = 0; i < checker; i++)
-                                {
-                                    buttons[0].OnInteract();
-                                    yield return new WaitForSeconds(0.25f);
-                                }
-                                buttons[2].OnInteract();
-                                yield return new WaitForSeconds(0.5f);
-                            }
-                            else if (checker == 0)
-                            {
-                                buttons[2].OnInteract();
-                                yield return new WaitForSeconds(0.5f);
-                            }
-                            else if (checker > -3 && checker < 0)
-                            {
-                                for (int i = 0; i < Mathf.Abs(checker); i++)
-                                {
-                                    buttons[1].OnInteract();
-                                    yield return new WaitForSeconds(0.25f);
-                                }
-                                buttons[2].OnInteract();
-                                yield return new WaitForSeconds(0.5f);
-                            }
-                            else if (checker <= -3)
-                            {
-                                for (int i = 0; i < 6+checker; i++)
-                                {
-                                    buttons[0].OnInteract();
-                                    yield return new WaitForSeconds(0.25f);
-                                }
-                                buttons[2].OnInteract();
-                                yield return new WaitForSeconds(0.5f);
-                            }
-                        }
-                    }
-                    break;
-                }
-                else if (param.EqualsIgnoreCase("press") && (parameters.Length == 1))
-                {
-                    buttons[2].OnInteract();
-                    yield return new WaitForSeconds(0.25f);
-                    break;
-                }
-                else if (param.EqualsIgnoreCase("left") && (parameters.Length == 1))
-                {
-                    buttons[1].OnInteract();
-                    yield return new WaitForSeconds(0.25f);
-                    break;
-                }
-                else if (param.EqualsIgnoreCase("right") && (parameters.Length == 1))
+                int amount = 0;
+                while(amount < 6)
                 {
                     buttons[0].OnInteract();
-                    yield return new WaitForSeconds(0.25f);
-                    break;
+                    amount++;
+                    yield return new WaitForSeconds(2.0f);
                 }
-                else if (param.EqualsIgnoreCase("reset") && (parameters.Length == 1))
-                {
-                    selectedpieces[currentselect].SetActive(false);
-                    currentselect = 0;
-                    selectedpieces[currentselect].SetActive(true);
-                    yield return new WaitForSeconds(0.25f);
-                    break;
-                }
-                else
-                {
-                    break;
-                }
+                break;
             }
-        }*/
+            else if (param.Equals("press") && !(parameters.Length <= 1))
+            {
+                foreach (string para in parameters)
+                {
+                    if(para != "press")
+                    {
+                        int nextpress = 0;
+                        int.TryParse(para, out nextpress);
+                        int checker = nextpress - (currentselect+1);
+                        if(checker >= 3){
+                            for(int i = 0; i < 6-checker; i++)
+                            {
+                                buttons[1].OnInteract();
+                                yield return new WaitForSeconds(0.25f);
+                            }
+                            buttons[2].OnInteract();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                        else if (checker > 0 && checker < 3){
+                            for (int i = 0; i < checker; i++)
+                            {
+                                buttons[0].OnInteract();
+                                yield return new WaitForSeconds(0.25f);
+                            }
+                            buttons[2].OnInteract();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                        else if (checker == 0)
+                        {
+                            buttons[2].OnInteract();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                        else if (checker > -3 && checker < 0)
+                        {
+                            for (int i = 0; i < Mathf.Abs(checker); i++)
+                            {
+                                buttons[1].OnInteract();
+                                yield return new WaitForSeconds(0.25f);
+                            }
+                            buttons[2].OnInteract();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                        else if (checker <= -3)
+                        {
+                            for (int i = 0; i < 6+checker; i++)
+                            {
+                                buttons[0].OnInteract();
+                                yield return new WaitForSeconds(0.25f);
+                            }
+                            buttons[2].OnInteract();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                    }
+                }
+                break;
+            }
+            else if (param.EqualsIgnoreCase("press") && (parameters.Length == 1))
+            {
+                buttons[2].OnInteract();
+                yield return new WaitForSeconds(0.25f);
+                break;
+            }
+            else if (param.EqualsIgnoreCase("left") && (parameters.Length == 1))
+            {
+                buttons[1].OnInteract();
+                yield return new WaitForSeconds(0.25f);
+                break;
+            }
+            else if (param.EqualsIgnoreCase("right") && (parameters.Length == 1))
+            {
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.25f);
+                break;
+            }
+            else if (param.EqualsIgnoreCase("reset") && (parameters.Length == 1))
+            {
+                selectedpieces[currentselect].SetActive(false);
+                currentselect = 0;
+                selectedpieces[currentselect].SetActive(true);
+                yield return new WaitForSeconds(0.25f);
+                break;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }*/
+
+    //Mod Settings continued
+    class RomanArtSettings
+    {
+        public bool censored = false;
+    }
+
+    static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
+    {
+        new Dictionary<string, object>
+        {
+            { "Filename", "romanArtModule-settings.json" },
+            { "Name", "Roman Art Settings" },
+            { "Listing", new List<Dictionary<string, object>>{
+                new Dictionary<string, object>
+                {
+                    { "Key", "censored" },
+                    { "Text", "Opt to use the censored version of the module if you don't want to deal with slight statue nudity" }
+                },
+            } }
+        }
+    };
 }

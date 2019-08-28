@@ -368,7 +368,6 @@ GameObject:
   - component: {fileID: 114235369766892872}
   - component: {fileID: 114137747078870040}
   - component: {fileID: 114543310137435694}
-  - component: {fileID: 114504062514440714}
   m_Layer: 0
   m_Name: RomanArt
   m_TagString: Untagged
@@ -1080,7 +1079,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1220863288016270}
   m_LocalRotation: {x: 1, y: -0, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0.90001}
+  m_LocalPosition: {x: 0, y: 0, z: 0.51}
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_Children: []
   m_Father: {fileID: 4648147525647448}
@@ -1093,7 +1092,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1381725078416282}
   m_LocalRotation: {x: 1, y: -0, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: -0, z: 0.9}
+  m_LocalPosition: {x: 0, y: 0, z: 0.51}
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_Children: []
   m_Father: {fileID: 4513992252490766}
@@ -2370,19 +2369,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114504062514440714
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1371807027823920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -289456416, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Settings: '{"censored": false}'
-  SettingsPath: romanArt-settings.txt
 --- !u!114 &114505236973848128
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2456,7 +2442,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audio: {fileID: 114335410585506892}
   bomb: {fileID: 114375059033245494}
-  ModSettings: {fileID: 114504062514440714}
   buttons:
   - {fileID: 114505236973848128}
   - {fileID: 114616266566084194}
