@@ -2058,7 +2058,7 @@ public class RomanArtScript : MonoBehaviour
     }
 
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all pieces on the module] | !{0} left [Cycle the pieces to the left by 1 (6th to 5th for example)] | !{0} right [Cycle the pieces to the right by 1 (5th to 6th for example)] | !{0} press [Presses the piece that is currently displayed] | !{0} press 2 4 5 [Presses several pieces in a specified order, in this case the 2nd piece, 4th piece, and 5th piece] | !{0} reset [Sets the display back to the initial position at piece #1]";
+    private readonly string TwitchHelpMessage = @"!{0} cycle [Cycles through all pieces on the module] | !{0} left/right [Cycle the pieces to the left or right by 1] | !{0} press [Presses the piece that is currently displayed] | !{0} press 2 4 5 [Presses several pieces in a specified order, in this case the 2nd piece, 4th piece, and 5th piece] | !{0} reset [Resets the module to display the 1st piece]";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
@@ -2078,7 +2078,7 @@ public class RomanArtScript : MonoBehaviour
             int amount = 0;
             while (amount < 6)
             {
-                yield return new[] { buttons[0] };
+                buttons[0].OnInteract();
                 amount++;
                 yield return new WaitForSeconds(2.0f);
             }
@@ -2087,22 +2087,19 @@ public class RomanArtScript : MonoBehaviour
         if (Regex.IsMatch(command, @"^\s*left\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            yield return new[] { buttons[1] };
-            yield return new WaitForSeconds(0.25f);
+            buttons[1].OnInteract();
             yield break;
         }
         if (Regex.IsMatch(command, @"^\s*right\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            yield return new[] { buttons[0] };
-            yield return new WaitForSeconds(0.25f);
+            buttons[0].OnInteract();
             yield break;
         }
         if (Regex.IsMatch(command, @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            yield return new[] { buttons[2] };
-            yield return new WaitForSeconds(0.25f);
+            buttons[2].OnInteract();
             yield break;
         }
         string[] parameters = command.Split(' ');
@@ -2110,6 +2107,7 @@ public class RomanArtScript : MonoBehaviour
         {
             if (inputIsValid(command))
             {
+                yield return null;
                 foreach (string str in parameters)
                 {
                     if (!str.EqualsIgnoreCase("press"))
@@ -2164,7 +2162,7 @@ public class RomanArtScript : MonoBehaviour
                         }
                     }
                 }
-                yield return null;
+                yield break;
             }
         }
     }
