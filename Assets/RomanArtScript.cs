@@ -2272,6 +2272,17 @@ public class RomanArtScript : MonoBehaviour
         }
     }*/
 
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        string presses = "";
+        for(int i = 0; i < order.Count; i++)
+        {
+            presses += order[i]+" ";
+        }
+        presses = presses.Trim();
+        yield return ProcessTwitchCommand("press " + presses);
+    }
+
     //Mod Settings continued
     class RomanArtSettings
     {
