@@ -16,6 +16,7 @@ public class RomanArtScript : MonoBehaviour
 
     public GameObject censordisplay;
     public GameObject numberdisplay;
+    public GameObject artcanvas;
     private int[] numbers = { 76, 125, 23, 59, 7, 231, 556, 82, 203 };
     private int currentnumber = 0;
     public GameObject[] artpieces;
@@ -26,6 +27,8 @@ public class RomanArtScript : MonoBehaviour
 
     private string step1num;
     private int step2num;
+
+    private bool animating = false;
 
     private ArrayList order = new ArrayList();
 
@@ -45,12 +48,12 @@ public class RomanArtScript : MonoBehaviour
             KMSelectable pressed = obj;
             pressed.OnInteract += delegate () { PressButton(pressed); return false; };
         }
+
         ModConfig<RomanArtSettings> modConfig = new ModConfig<RomanArtSettings>("romanArtModule-settings");
         //Read from the settings file, or create one if one doesn't exist
         modSettings = modConfig.Settings;
         //Update the settings file incase there was an error during read
         modConfig.Settings = modSettings;
-        Debug.LogFormat("[Roman Art #{0}] Censored mode: {1}", moduleId, modSettings.censored);
         if (modSettings.censored == false)
         {
             censordisplay.GetComponent<TextMesh>().text = " ";
@@ -59,6 +62,10 @@ public class RomanArtScript : MonoBehaviour
         {
             censordisplay.GetComponent<TextMesh>().text = "C";
         }
+        Debug.LogFormat("[Roman Art #{0}] Censored mode: {1}", moduleId, modSettings.censored);
+        artcanvas.SetActive(false);
+        numberdisplay.SetActive(false);
+        censordisplay.SetActive(false);
     }
 
     void Start()
@@ -72,16 +79,25 @@ public class RomanArtScript : MonoBehaviour
             performStep1();
             performStep2();
             performStep3();
+            GetComponent<KMBombModule>().OnActivate = OnActivate;
         }
+    }
+
+    void OnActivate()
+    {
+        artcanvas.SetActive(true);
+        numberdisplay.SetActive(true);
+        censordisplay.SetActive(true);
     }
 
     void PressButton(KMSelectable pressed)
     {
-        if (moduleSolved != true)
+        if (moduleSolved != true && animating != true)
         {
             pressed.AddInteractionPunch(0.5f);
             if (pressed.name.Equals("buttonRight"))
             {
+                StartCoroutine(animateButton(pressed));
                 selectedpieces[currentselect].SetActive(false);
                 currentselect++;
                 if (currentselect >= 6)
@@ -93,6 +109,7 @@ public class RomanArtScript : MonoBehaviour
             }
             else if (pressed.name.Equals("buttonLeft"))
             {
+                StartCoroutine(animateButton(pressed));
                 selectedpieces[currentselect].SetActive(false);
                 currentselect--;
                 if (currentselect <= -1)
@@ -132,6 +149,7 @@ public class RomanArtScript : MonoBehaviour
                     GetComponent<KMBombModule>().HandlePass();
                     numberdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
                     Debug.LogFormat("[Roman Art #{0}] All Pieces Pressed Correctly, Module Disarmed.", moduleId, comparer);
+                    artcanvas.SetActive(false);
                     moduleSolved = true;
                     int decider = randomVictory();
                     switch (decider)
@@ -156,6 +174,27 @@ public class RomanArtScript : MonoBehaviour
                 }
             }
         }
+    }
+
+    private IEnumerator animateButton(KMSelectable button)
+    {
+        animating = true;
+        int movement = 0;
+        while (movement != 10)
+        {
+            yield return new WaitForSeconds(0.005f);
+            button.transform.localPosition = button.transform.localPosition + Vector3.up * -0.0003f;
+            movement++;
+        }
+        movement = 0;
+        while (movement != 10)
+        {
+            yield return new WaitForSeconds(0.005f);
+            button.transform.localPosition = button.transform.localPosition + Vector3.up * 0.0003f;
+            movement++;
+        }
+        StopCoroutine("animateButton");
+        animating = false;
     }
 
     private void performStep1()
@@ -2286,7 +2325,7 @@ public class RomanArtScript : MonoBehaviour
     //Mod Settings continued
     class RomanArtSettings
     {
-        public bool censored = false;
+        public bool censored = true;
     }
 
     static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
