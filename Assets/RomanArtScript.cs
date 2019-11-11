@@ -28,8 +28,6 @@ public class RomanArtScript : MonoBehaviour
     private string step1num;
     private int step2num;
 
-    private bool animating = false;
-
     private ArrayList order = new ArrayList();
 
     // Mod Settings
@@ -92,7 +90,7 @@ public class RomanArtScript : MonoBehaviour
 
     void PressButton(KMSelectable pressed)
     {
-        if (moduleSolved != true && animating != true)
+        if (moduleSolved != true)
         {
             pressed.AddInteractionPunch(0.5f);
             if (pressed.name.Equals("buttonRight"))
@@ -178,7 +176,6 @@ public class RomanArtScript : MonoBehaviour
 
     private IEnumerator animateButton(KMSelectable button)
     {
-        animating = true;
         int movement = 0;
         while (movement != 10)
         {
@@ -194,7 +191,6 @@ public class RomanArtScript : MonoBehaviour
             movement++;
         }
         StopCoroutine("animateButton");
-        animating = false;
     }
 
     private void performStep1()
@@ -2159,10 +2155,7 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < 6 - checker; i++)
                             {
                                 buttons[1].OnInteract();
-                                while(animating == true)
-                                {
-                                    yield return new WaitForSeconds(0.25f);
-                                }
+                                yield return new WaitForSeconds(0.25f);
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2172,10 +2165,7 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < checker; i++)
                             {
                                 buttons[0].OnInteract();
-                                while (animating == true)
-                                {
-                                    yield return new WaitForSeconds(0.25f);
-                                }
+                                yield return new WaitForSeconds(0.25f);
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2183,20 +2173,14 @@ public class RomanArtScript : MonoBehaviour
                         else if (checker == 0)
                         {
                             buttons[2].OnInteract();
-                            while (animating == true)
-                            {
-                                yield return new WaitForSeconds(0.25f);
-                            }
+                            yield return new WaitForSeconds(0.5f);
                         }
                         else if (checker > -3 && checker < 0)
                         {
                             for (int i = 0; i < Mathf.Abs(checker); i++)
                             {
                                 buttons[1].OnInteract();
-                                while (animating == true)
-                                {
-                                    yield return new WaitForSeconds(0.25f);
-                                }
+                                yield return new WaitForSeconds(0.25f);
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2206,10 +2190,7 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < 6 + checker; i++)
                             {
                                 buttons[0].OnInteract();
-                                while (animating == true)
-                                {
-                                    yield return new WaitForSeconds(0.25f);
-                                }
+                                yield return new WaitForSeconds(0.25f);
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
