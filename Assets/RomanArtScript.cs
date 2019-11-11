@@ -2159,7 +2159,10 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < 6 - checker; i++)
                             {
                                 buttons[1].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                                while(animating == true)
+                                {
+                                    yield return new WaitForSeconds(0.25f);
+                                }
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2169,7 +2172,10 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < checker; i++)
                             {
                                 buttons[0].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                                while (animating == true)
+                                {
+                                    yield return new WaitForSeconds(0.25f);
+                                }
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2177,14 +2183,20 @@ public class RomanArtScript : MonoBehaviour
                         else if (checker == 0)
                         {
                             buttons[2].OnInteract();
-                            yield return new WaitForSeconds(0.5f);
+                            while (animating == true)
+                            {
+                                yield return new WaitForSeconds(0.25f);
+                            }
                         }
                         else if (checker > -3 && checker < 0)
                         {
                             for (int i = 0; i < Mathf.Abs(checker); i++)
                             {
                                 buttons[1].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                                while (animating == true)
+                                {
+                                    yield return new WaitForSeconds(0.25f);
+                                }
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
@@ -2194,7 +2206,10 @@ public class RomanArtScript : MonoBehaviour
                             for (int i = 0; i < 6 + checker; i++)
                             {
                                 buttons[0].OnInteract();
-                                yield return new WaitForSeconds(0.25f);
+                                while (animating == true)
+                                {
+                                    yield return new WaitForSeconds(0.25f);
+                                }
                             }
                             buttons[2].OnInteract();
                             yield return new WaitForSeconds(0.5f);
